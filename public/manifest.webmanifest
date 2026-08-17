@@ -1,0 +1,11 @@
+{
+  "name": "コンテンツ & レター生成AI",
+  "short_name": "コンテンツAI",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0D0D14",
+  "theme_color": "#0D0D14",
+  "lang": "ja",
+  "description": "セールスレター・漫画シナリオ・動画絵コンテ・チラシ・パンフレットをAIで作成",
+  "icons": [{"src":"/icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
+}
