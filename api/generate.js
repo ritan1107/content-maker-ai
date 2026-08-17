@@ -14,7 +14,7 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'prompt is required' });
     }
 
-    const model = process.env.GEMINI_MODEL || 'gemini-2.5-flash-lite';
+    const model = process.env.GEMINI_MODEL || 'gemini-3.5-flash-lite';
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
     const payload = {
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
