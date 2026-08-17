@@ -8,7 +8,7 @@ export default async function handler(req, res) {
     const { prompt, aspectRatio = '4:5', imageSize = '1K' } = req.body || {};
     if (!prompt || typeof prompt !== 'string') return res.status(400).json({ error: 'prompt is required' });
 
-    const model = process.env.GEMINI_IMAGE_MODEL || 'gemini-3.1-flash-image';
+    const model = process.env.GEMINI_IMAGE_MODEL || 'gemini-3.1-flash-lite-image';
     const response = await fetch('https://generativelanguage.googleapis.com/v1beta/interactions', {
       method: 'POST',
       headers: {
@@ -28,7 +28,15 @@ export default async function handler(req, res) {
     });
 
     const data = await response.json();
-    if (!response.ok) return res.status(response.status).json({ error: data?.error?.message || 'Gemini image request failed' });
+    if (!response.ok) {
+      const raw = data?.error?.message || 'Gemini image request failed';
+      if (response.status === 429 || /quota|rate limit|RESOURCE_EXHAUSTED/i.test(raw)) {
+        return res.status(429).json({
+          error: '画像生成用Gemini APIの無料枠はありません。Google AI StudioでこのAPIキーのプロジェクトに請求先を設定すると画像生成を利用できます。設定後にもう一度お試しください。'
+        });
+      }
+      return res.status(response.status).json({ error: raw });
+    }
 
     let imageBlock = null;
     for (const step of data?.steps || []) {
