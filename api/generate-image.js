@@ -20,7 +20,7 @@ export default async function handler(req, res) {
         input: [{ type: 'text', text: prompt }],
         response_format: {
           type: 'image',
-          mime_type: 'image/png',
+          mime_type: 'image/jpeg',
           aspect_ratio: aspectRatio,
           image_size: imageSize
         }
@@ -39,7 +39,7 @@ export default async function handler(req, res) {
     }
     if (!imageBlock) return res.status(502).json({ error: 'Gemini returned no image.' });
 
-    return res.status(200).json({ image: imageBlock.data, mimeType: imageBlock.mime_type || 'image/png', model });
+    return res.status(200).json({ image: imageBlock.data, mimeType: imageBlock.mime_type || 'image/jpeg', model });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: error?.message || 'Unexpected server error' });
