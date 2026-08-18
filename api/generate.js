@@ -1,3 +1,5 @@
+import { STORYBOARD_MODULE } from './storyboard-module.js';
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -16,16 +18,20 @@ export default async function handler(req, res) {
 
     const model = process.env.GEMINI_MODEL || 'gemini-3.5-flash-lite';
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
+    const isStoryboard = /動画絵コンテ|絵コンテ|storyboard/i.test(prompt);
+    const baseInstruction = systemInstruction || 'あなたは世界最高峰のセールスライター、マーケター、そしてクリエイティブディレクターです。ユーザーの指示に従い、指定された用途に合わせて魅力的で実用的な日本語の構成・テキストを作成してください。誇大表現を避け、事実として確認できない数値や体験談は創作しないでください。';
+    const mergedInstruction = isStoryboard
+      ? `${baseInstruction}\n\n${STORYBOARD_MODULE}`
+      : baseInstruction;
+
     const payload = {
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
       systemInstruction: {
-        parts: [{
-          text: systemInstruction || 'あなたは世界最高峰のセールスライター、マーケター、そしてクリエイティブディレクターです。ユーザーの指示に従い、指定された用途に合わせて魅力的で実用的な日本語の構成・テキストを作成してください。誇大表現を避け、事実として確認できない数値や体験談は創作しないでください。'
-        }]
+        parts: [{ text: mergedInstruction }]
       },
       generationConfig: {
-        temperature: 0.9,
-        maxOutputTokens: 8192
+        temperature: isStoryboard ? 0.82 : 0.9,
+        maxOutputTokens: isStoryboard ? 16384 : 8192
       }
     };
 
